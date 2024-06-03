@@ -309,6 +309,11 @@ function SignInPage() {
             className="w-40 sm:w-32 mx-auto mb-6 sm:mb-8 rounded-full border-4 border-white shadow-md animate-float"
             alt="logo"
           />
+          {subdomain && (
+            <p className="text-xl font-semibold text-gray-800 text-center mb-6">
+              {subdomain.charAt(0).toUpperCase() + subdomain.slice(1)}
+            </p>
+          )}
           <form className="space-y-6 sm:space-y-8" onSubmit={handleSignIn}>
             <div>
               <label

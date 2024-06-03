@@ -93,9 +93,7 @@ const AdminButton = styled.button`
   }
 
   @media (max-width: 768px) {
-    padding: 6px 12px;
-    font-size: 12px;
-    border-radius: 6px;
+    display: none;
   }
 
   svg {
@@ -353,7 +351,7 @@ function Layout({ children }) {
         </Logo>
         <NavItems>
           {userRole !== "P" && (
-            <AdminButton theme={theme} onClick={() => navigate("/admin")}>
+            <AdminButton theme={theme} onClick={() => navigate("/admin-panel")}>
               <span className="material-symbols-outlined">
                 admin_panel_settings
               </span>
