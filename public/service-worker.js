@@ -131,4 +131,4 @@ async function replayQueuedRequests() {
 }
 
 // Periodically trigger replay of queued requests
-setInterval(replayQueuedRequests, 60000); // Run every 60 seconds
+setInterval(replayQueuedRequests, 10); // Run every 60 seconds
