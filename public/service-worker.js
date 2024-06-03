@@ -54,8 +54,8 @@ self.addEventListener("fetch", (event) => {
     );
   } else if (["POST", "DELETE", "PATCH"].includes(event.request.method)) {
     event.respondWith(
-      fetch(event.request).catch(() => {
-        return enqueueRequest(event.request).then(() => {
+      fetch(event.request.clone()).catch(() => {
+        return enqueueRequest(event.request.clone()).then(() => {
           return new Response(null, { status: 202, statusText: "Queued" });
         });
       })
@@ -86,19 +86,21 @@ async function enqueueRequest(request) {
     },
   });
 
+  const requestClone = request.clone();
+  const body = await requestClone.text();
+
   const queuedRequest = {
     url: request.url,
     method: request.method,
-    headers: Object.fromEntries(request.headers.entries()),
-    body: await request.text(),
+    headers: [...request.headers.entries()],
+    body: body,
   };
 
   const tx = db.transaction("requests", "readwrite");
   await tx.objectStore("requests").add(queuedRequest);
   await tx.complete;
-
-  replayQueuedRequests(); // Always trigger replay, regardless of Background Sync support
 }
+
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "REPLAY_QUEUED_REQUESTS") {
     replayQueuedRequests();
@@ -135,6 +137,3 @@ async function replayQueuedRequests() {
     await new Promise((resolve) => setTimeout(resolve, 100)); // Delay before next request
   }
 }
-
-// Periodically trigger replay of queued requests
-setInterval(replayQueuedRequests, 10); // Run every 60 seconds
