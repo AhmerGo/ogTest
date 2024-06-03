@@ -256,7 +256,7 @@ const ViewFieldTicket = () => {
 
         if (parts.length > 2) {
           const subdomainPart = parts.shift();
-          baseUrl = `https://${subdomainPart}.ogpumper.net`;
+          baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
           console.log(`Using subdomain URL: ${baseUrl}`);
         } else {
           baseUrl = "https://ogfieldticket.com";
@@ -349,7 +349,7 @@ const ViewFieldTicket = () => {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
       } else {
         baseUrl = "https://ogfieldticket.com";
       }
@@ -439,7 +439,7 @@ const ViewFieldTicket = () => {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";
@@ -518,7 +518,7 @@ const ViewFieldTicket = () => {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";
@@ -617,7 +617,7 @@ const ViewFieldTicket = () => {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";

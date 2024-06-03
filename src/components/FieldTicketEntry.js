@@ -74,7 +74,7 @@ function FieldTicketEntry() {
 
         if (parts.length > 2) {
           const subdomainPart = parts.shift();
-          baseUrl = `https://${subdomainPart}.ogpumper.net`;
+          baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         } else {
           baseUrl = "https://ogfieldticket.com";
         }
@@ -200,7 +200,7 @@ function FieldTicketEntry() {
       const formattedDate = new Date().toISOString().split("T")[0];
 
       const baseUrl = subdomain
-        ? `https://${subdomain}.ogpumper.net`
+        ? `https://${subdomain}.ogfieldticket.com`
         : "https://ogfieldticket.com";
 
       const ticketData = {

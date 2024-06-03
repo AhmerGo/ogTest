@@ -58,7 +58,7 @@ const JobListPage = () => {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";
@@ -154,7 +154,7 @@ const JobListPage = () => {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";
@@ -184,7 +184,7 @@ const JobListPage = () => {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";
@@ -216,7 +216,7 @@ const JobListPage = () => {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";
@@ -245,7 +245,7 @@ const JobListPage = () => {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";
@@ -276,7 +276,7 @@ const JobListPage = () => {
 
         if (parts.length > 2) {
           const subdomainPart = parts.shift();
-          baseUrl = `https://${subdomainPart}.ogpumper.net`;
+          baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
           console.log(`Using subdomain URL: ${baseUrl}`);
         } else {
           baseUrl = "https://ogfieldticket.com";
@@ -327,7 +327,7 @@ const JobListPage = () => {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";
@@ -616,7 +616,7 @@ const ItemsAnimation = ({
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";
@@ -667,7 +667,7 @@ const ItemsAnimation = ({
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
       } else {
         baseUrl = "https://ogfieldticket.com";
       }
@@ -701,7 +701,7 @@ const ItemsAnimation = ({
   const handleDeleteItem = (itemId) => {
     console.log(itemId);
     const baseUrl = subdomain
-      ? `https://${subdomain}.ogpumper.net`
+      ? `https://${subdomain}.ogfieldticket.com`
       : "https://ogfieldticket.com";
 
     const data = {
@@ -736,7 +736,7 @@ const ItemsAnimation = ({
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
         baseUrl = "https://ogfieldticket.com";
