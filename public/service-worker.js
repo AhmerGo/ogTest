@@ -1,5 +1,6 @@
+importScripts("/idb.js");
+
 const CACHE_NAME = "my-app-cache-v1";
-const QUEUE_NAME = "request-queue";
 const urlsToCache = [
   "/",
   "/index.html",
@@ -84,6 +85,12 @@ self.addEventListener("activate", (event) => {
 });
 
 async function enqueueRequest(request, body) {
+  const db = await idb.openDB("request-queue", 1, {
+    upgrade(db) {
+      db.createObjectStore("requests", { keyPath: "id", autoIncrement: true });
+    },
+  });
+
   const queuedRequest = {
     url: request.url,
     method: request.method,
@@ -91,12 +98,9 @@ async function enqueueRequest(request, body) {
     body: body,
   };
 
-  const cache = await caches.open(QUEUE_NAME);
-  const id = new Date().toISOString();
-  await cache.put(
-    new Request(id, { method: "GET" }),
-    new Response(JSON.stringify(queuedRequest))
-  );
+  const tx = db.transaction("requests", "readwrite");
+  await tx.objectStore("requests").add(queuedRequest);
+  await tx.complete;
 
   if ("sync" in self.registration) {
     self.registration.sync.register("replay-queued-requests");
@@ -112,11 +116,12 @@ self.addEventListener("sync", (event) => {
 });
 
 async function replayQueuedRequests() {
-  const cache = await caches.open(QUEUE_NAME);
-  const requests = await cache.keys();
-  for (const request of requests) {
-    const response = await cache.match(request);
-    const queuedRequest = await response.json();
+  const db = await idb.openDB("request-queue", 1);
+  const tx = db.transaction("requests", "readonly");
+  const store = tx.objectStore("requests");
+  const requests = await store.getAll();
+
+  for (const queuedRequest of requests) {
     const headers = new Headers(queuedRequest.headers);
     headers.set("Content-Type", "application/json");
 
@@ -129,7 +134,9 @@ async function replayQueuedRequests() {
     try {
       const networkResponse = await fetch(queuedRequest.url, fetchOptions);
       if (networkResponse.ok) {
-        await cache.delete(request);
+        const txDelete = db.transaction("requests", "readwrite");
+        await txDelete.objectStore("requests").delete(queuedRequest.id);
+        await txDelete.complete;
       }
     } catch (error) {
       console.error("Replay queued request failed", error);

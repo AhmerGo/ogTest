@@ -48,4 +48,22 @@ const RootComponent = () => {
 
 root.render(<RootComponent />);
 
-serviceWorker.register();
+serviceWorker.register({
+  onUpdate: (registration) => {
+    const waitingServiceWorker = registration.waiting;
+
+    if (waitingServiceWorker) {
+      waitingServiceWorker.addEventListener("statechange", (event) => {
+        if (event.target.state === "activated") {
+          // The new service worker is activated and ready to take control.
+          console.log("New service worker activated.");
+        }
+      });
+
+      waitingServiceWorker.postMessage({ type: "SKIP_WAITING" });
+    }
+  },
+  onSuccess: (registration) => {
+    console.log("Service Worker registered successfully:", registration);
+  },
+});
