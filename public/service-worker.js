@@ -99,6 +99,11 @@ async function enqueueRequest(request) {
 
   replayQueuedRequests(); // Always trigger replay, regardless of Background Sync support
 }
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "REPLAY_QUEUED_REQUESTS") {
+    replayQueuedRequests();
+  }
+});
 
 async function replayQueuedRequests() {
   const db = await idb.openDB("request-queue", 1);
@@ -108,6 +113,7 @@ async function replayQueuedRequests() {
 
   for (const queuedRequest of requests) {
     const headers = new Headers(queuedRequest.headers);
+    headers.set("Content-Type", "application/json");
 
     const fetchOptions = {
       method: queuedRequest.method,
@@ -126,7 +132,7 @@ async function replayQueuedRequests() {
       console.error("Replay queued request failed", error);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 5000)); // Increased delay to 5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Delay before next request
   }
 }
 

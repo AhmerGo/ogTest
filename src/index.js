@@ -13,6 +13,9 @@ const RootComponent = () => {
   useEffect(() => {
     const handleOnline = () => {
       setShowReloadModal(true);
+      navigator.serviceWorker.controller.postMessage({
+        type: "REPLAY_QUEUED_REQUESTS",
+      });
     };
 
     window.addEventListener("online", handleOnline);
