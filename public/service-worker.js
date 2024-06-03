@@ -54,15 +54,10 @@ self.addEventListener("fetch", (event) => {
     );
   } else if (["POST", "DELETE", "PATCH"].includes(event.request.method)) {
     event.respondWith(
-      fetch(event.request.clone()).catch(() => {
-        return event.request
-          .clone()
-          .text()
-          .then((body) => {
-            return enqueueRequest(event.request, body).then(() => {
-              return new Response(null, { status: 202, statusText: "Queued" });
-            });
-          });
+      fetch(event.request).catch(() => {
+        return enqueueRequest(event.request).then(() => {
+          return new Response(null, { status: 202, statusText: "Queued" });
+        });
       })
     );
   }
@@ -84,7 +79,7 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-async function enqueueRequest(request, body) {
+async function enqueueRequest(request) {
   const db = await idb.openDB("request-queue", 1, {
     upgrade(db) {
       db.createObjectStore("requests", { keyPath: "id", autoIncrement: true });
@@ -94,26 +89,16 @@ async function enqueueRequest(request, body) {
   const queuedRequest = {
     url: request.url,
     method: request.method,
-    headers: [...request.headers.entries()],
-    body: body,
+    headers: Object.fromEntries(request.headers.entries()),
+    body: await request.text(),
   };
 
   const tx = db.transaction("requests", "readwrite");
   await tx.objectStore("requests").add(queuedRequest);
   await tx.complete;
 
-  if ("sync" in self.registration) {
-    self.registration.sync.register("replay-queued-requests");
-  } else {
-    replayQueuedRequests(); // Fallback for browsers without Background Sync
-  }
+  replayQueuedRequests(); // Always trigger replay, regardless of Background Sync support
 }
-
-self.addEventListener("sync", (event) => {
-  if (event.tag === "replay-queued-requests") {
-    event.waitUntil(replayQueuedRequests());
-  }
-});
 
 async function replayQueuedRequests() {
   const db = await idb.openDB("request-queue", 1);
@@ -123,7 +108,6 @@ async function replayQueuedRequests() {
 
   for (const queuedRequest of requests) {
     const headers = new Headers(queuedRequest.headers);
-    headers.set("Content-Type", "application/json");
 
     const fetchOptions = {
       method: queuedRequest.method,
@@ -142,6 +126,9 @@ async function replayQueuedRequests() {
       console.error("Replay queued request failed", error);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Delay before next request
+    await new Promise((resolve) => setTimeout(resolve, 5000)); // Increased delay to 5 seconds
   }
 }
+
+// Periodically trigger replay of queued requests
+setInterval(replayQueuedRequests, 60000); // Run every 60 seconds
