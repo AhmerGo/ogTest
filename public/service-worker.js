@@ -20,7 +20,7 @@ self.addEventListener("install", (event) => {
       return cache.addAll(urlsToCache);
     })
   );
-  self.skipWaiting(); // Ensures the service worker activates immediately
+  self.skipWaiting();
 });
 
 self.addEventListener("fetch", (event) => {
@@ -80,7 +80,7 @@ self.addEventListener("activate", (event) => {
       );
     })
   );
-  self.clients.claim(); // Ensures the service worker takes control immediately
+  self.clients.claim();
 });
 
 async function enqueueRequest(request, body) {
@@ -97,8 +97,12 @@ async function enqueueRequest(request, body) {
     new Request(id, { method: "GET" }),
     new Response(JSON.stringify(queuedRequest))
   );
-  // Register sync for the queued request
-  self.registration.sync.register("replay-queued-requests");
+
+  if ("sync" in self.registration) {
+    self.registration.sync.register("replay-queued-requests");
+  } else {
+    replayQueuedRequests(); // Fallback for browsers without Background Sync
+  }
 }
 
 self.addEventListener("sync", (event) => {
@@ -114,12 +118,12 @@ async function replayQueuedRequests() {
     const response = await cache.match(request);
     const queuedRequest = await response.json();
     const headers = new Headers(queuedRequest.headers);
-    headers.set("Content-Type", "application/json"); // Set the Content-Type header
+    headers.set("Content-Type", "application/json");
 
     const fetchOptions = {
       method: queuedRequest.method,
       headers: headers,
-      body: queuedRequest.body, // Use the stored JSON string body
+      body: queuedRequest.body,
     };
 
     try {
