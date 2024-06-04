@@ -29,10 +29,7 @@ const RootComponent = () => {
 
   const handleReloadConfirm = () => {
     setShowLoadingModal(true);
-    setTimeout(() => {
-      window.location.reload();
-      setShowLoadingModal(false);
-    }, 15000);
+    window.location.reload(); // Remove the delay for faster reload
   };
 
   const handleReloadCancel = () => {
