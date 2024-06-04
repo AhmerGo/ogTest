@@ -4,7 +4,6 @@ import { useTheme } from "./ThemeContext";
 import { useSpring, animated } from "react-spring";
 import { useUser } from "./UserContext";
 import Modal from "react-modal";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearchPlus,
@@ -24,6 +23,7 @@ function FieldTicketEntry() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const fileInputRef = useRef(null);
   const MAX_FILE_SIZE = 6 * 1024 * 1024; // 6MB
 
@@ -56,6 +56,18 @@ function FieldTicketEntry() {
 
     extractSubdomain();
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const updateOnlineStatus = () => {
+      setIsOnline(navigator.onLine);
+    };
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
+    return () => {
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
+    };
   }, []);
 
   const handleImageChange = (event) => {
@@ -129,7 +141,6 @@ function FieldTicketEntry() {
     if (validFiles.length > 0) {
       handleImageUpload({ target: { files: validFiles } });
     } else {
-      // Clear the file input if no valid files
       fileInputRef.current.value = "";
     }
   };
@@ -137,7 +148,7 @@ function FieldTicketEntry() {
   const handleDeleteImage = (index) => {
     setUploadedImages(uploadedImages.filter((_, i) => i !== index));
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // Clear the file input field
+      fileInputRef.current.value = "";
     }
   };
 
@@ -151,6 +162,7 @@ function FieldTicketEntry() {
       fileInputRef.current.click();
     }
   };
+
   const handleImageUpload = (e) => {
     const files = e.target.files;
     const newImages = [];
@@ -242,7 +254,6 @@ function FieldTicketEntry() {
         Ticket: formFields.ticketNumber,
       };
 
-      // Save ticket to local storage in one operation
       const storeTicket = (ticket) => {
         const storedTickets = JSON.parse(localStorage.getItem("tickets")) || [];
         storedTickets.push(ticket);
@@ -743,13 +754,17 @@ function FieldTicketEntry() {
                           <>
                             <button
                               className="focus:outline-none"
-                              onClick={() => triggerFileInput(true)}
+                              onClick={() => isOnline && triggerFileInput(true)}
+                              disabled={!isOnline}
                             >
                               <FontAwesomeIcon icon={faCamera} size="3x" />
                             </button>
                             <button
                               className="focus:outline-none ml-4"
-                              onClick={() => triggerFileInput(false)}
+                              onClick={() =>
+                                isOnline && triggerFileInput(false)
+                              }
+                              disabled={!isOnline}
                             >
                               <FontAwesomeIcon icon={faFolderOpen} size="3x" />
                             </button>
@@ -757,7 +772,8 @@ function FieldTicketEntry() {
                         ) : (
                           <button
                             className="focus:outline-none"
-                            onClick={() => triggerFileInput(false)}
+                            onClick={() => isOnline && triggerFileInput(false)}
+                            disabled={!isOnline}
                           >
                             <FontAwesomeIcon icon={faPlusCircle} size="3x" />
                           </button>
@@ -774,6 +790,7 @@ function FieldTicketEntry() {
                       }}
                       ref={fileInputRef}
                       className="hidden"
+                      disabled={!isOnline}
                     />
                   </div>
 
