@@ -55,9 +55,14 @@ self.addEventListener("fetch", (event) => {
   } else if (["POST", "DELETE", "PATCH"].includes(event.request.method)) {
     event.respondWith(
       fetch(event.request.clone()).catch(() => {
-        return enqueueRequest(event.request.clone()).then(() => {
-          return new Response(null, { status: 202, statusText: "Queued" });
-        });
+        return event.request
+          .clone()
+          .text()
+          .then((body) => {
+            return enqueueRequest(event.request, body).then(() => {
+              return new Response(null, { status: 202, statusText: "Queued" });
+            });
+          });
       })
     );
   }
@@ -79,20 +84,12 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-async function enqueueRequest(request) {
+async function enqueueRequest(request, body) {
   const db = await idb.openDB("request-queue", 1, {
     upgrade(db) {
-      if (!db.objectStoreNames.contains("requests")) {
-        db.createObjectStore("requests", {
-          keyPath: "id",
-          autoIncrement: true,
-        });
-      }
+      db.createObjectStore("requests", { keyPath: "id", autoIncrement: true });
     },
   });
-
-  const requestClone = request.clone();
-  const body = await requestClone.text();
 
   const queuedRequest = {
     url: request.url,
@@ -104,10 +101,17 @@ async function enqueueRequest(request) {
   const tx = db.transaction("requests", "readwrite");
   await tx.objectStore("requests").add(queuedRequest);
   await tx.complete;
+
+  if ("sync" in self.registration) {
+    self.registration.sync.register("replay-queued-requests");
+  } else {
+    replayQueuedRequests(); // Fallback for browsers without Background Sync
+  }
 }
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "REPLAY_QUEUED_REQUESTS") {
-    replayQueuedRequests();
+
+self.addEventListener("sync", (event) => {
+  if (event.tag === "replay-queued-requests") {
+    event.waitUntil(replayQueuedRequests());
   }
 });
 
