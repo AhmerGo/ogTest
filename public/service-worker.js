@@ -92,12 +92,12 @@ async function enqueueRequest(request, body) {
 
   const tx = db.transaction("requests", "readwrite");
   await tx.objectStore("requests").add(queuedRequest);
-  await tx.complete;
+  await tx.done;
 
   if ("sync" in self.registration) {
     self.registration.sync.register("replay-queued-requests");
   } else {
-    replayQueuedRequests();
+    setTimeout(replayQueuedRequests, 5000); // Delay to avoid immediate reprocessing
   }
 }
 
@@ -115,7 +115,9 @@ async function replayQueuedRequests() {
 
   for (const queuedRequest of requests) {
     const headers = new Headers(queuedRequest.headers);
-    headers.set("Content-Type", "application/json");
+    if (queuedRequest.body) {
+      headers.set("Content-Type", "application/json");
+    }
 
     const fetchOptions = {
       method: queuedRequest.method,
@@ -128,7 +130,7 @@ async function replayQueuedRequests() {
       if (networkResponse.ok) {
         const txDelete = db.transaction("requests", "readwrite");
         await txDelete.objectStore("requests").delete(queuedRequest.id);
-        await txDelete.complete;
+        await txDelete.done;
       }
     } catch (error) {
       console.error("Replay queued request failed", error);
