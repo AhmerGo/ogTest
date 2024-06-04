@@ -17,9 +17,7 @@ const urlsToCache = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
   );
   self.skipWaiting();
 });
@@ -58,11 +56,7 @@ self.addEventListener("fetch", (event) => {
         return event.request
           .clone()
           .text()
-          .then((body) => {
-            return enqueueRequest(event.request, body).then(() => {
-              return new Response(null, { status: 202, statusText: "Queued" });
-            });
-          });
+          .then((body) => enqueueRequest(event.request, body));
       })
     );
   }
@@ -71,15 +65,15 @@ self.addEventListener("fetch", (event) => {
 self.addEventListener("activate", (event) => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
+    caches.keys().then((cacheNames) =>
+      Promise.all(
         cacheNames.map((cacheName) => {
           if (!cacheWhitelist.includes(cacheName)) {
             return caches.delete(cacheName);
           }
         })
-      );
-    })
+      )
+    )
   );
   self.clients.claim();
 });
@@ -105,7 +99,7 @@ async function enqueueRequest(request, body) {
   if ("sync" in self.registration) {
     self.registration.sync.register("replay-queued-requests");
   } else {
-    replayQueuedRequests(); // Fallback for browsers without Background Sync
+    replayQueuedRequests();
   }
 }
 
@@ -142,6 +136,6 @@ async function replayQueuedRequests() {
       console.error("Replay queued request failed", error);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Delay before next request
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
 }
