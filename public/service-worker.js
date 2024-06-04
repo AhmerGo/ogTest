@@ -32,12 +32,7 @@ self.addEventListener("fetch", (event) => {
         } else {
           try {
             const networkResponse = await fetch(event.request);
-            if (
-              networkResponse &&
-              networkResponse.status === 200 &&
-              (networkResponse.type === "basic" ||
-                networkResponse.type === "cors")
-            ) {
+            if (networkResponse && networkResponse.status === 200) {
               const responseToCache = networkResponse.clone();
               const cache = await caches.open(CACHE_NAME);
               cache.put(event.request, responseToCache);
