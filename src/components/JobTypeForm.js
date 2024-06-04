@@ -61,7 +61,7 @@ const JobListPage = () => {
         baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
-        baseUrl = "https://ogfieldticket.com";
+        baseUrl = "https://test.ogfieldticket.com";
         console.log(`Using default URL: ${baseUrl}`);
       }
 
@@ -157,7 +157,7 @@ const JobListPage = () => {
         baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
-        baseUrl = "https://ogfieldticket.com";
+        baseUrl = "https://test.ogfieldticket.com";
         console.log(`Using default URL: ${baseUrl}`);
       }
       const response = await fetch(
@@ -187,7 +187,7 @@ const JobListPage = () => {
         baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
-        baseUrl = "https://ogfieldticket.com";
+        baseUrl = "https://test.ogfieldticket.com";
         console.log(`Using default URL: ${baseUrl}`);
       }
       const response = await fetch(
@@ -219,7 +219,7 @@ const JobListPage = () => {
         baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
-        baseUrl = "https://ogfieldticket.com";
+        baseUrl = "https://test.ogfieldticket.com";
         console.log(`Using default URL: ${baseUrl}`);
       }
       await axios.patch(`${baseUrl}/api/jobs.php?jobtype=${jobId}`, {
@@ -248,7 +248,7 @@ const JobListPage = () => {
         baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
-        baseUrl = "https://ogfieldticket.com";
+        baseUrl = "https://test.ogfieldticket.com";
         console.log(`Using default URL: ${baseUrl}`);
       }
       await axios.patch(`${baseUrl}/api/jobs.php?jobtype=${jobId}`, {
@@ -274,7 +274,7 @@ const JobListPage = () => {
           baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
           console.log(`Using subdomain URL: ${baseUrl}`);
         } else {
-          baseUrl = "https://ogfieldticket.com";
+          baseUrl = "https://test.ogfieldticket.com";
           console.log(`Using default URL: ${baseUrl}`);
         }
 
@@ -317,7 +317,7 @@ const JobListPage = () => {
         baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
-        baseUrl = "https://ogfieldticket.com";
+        baseUrl = "https://test.ogfieldticket.com";
         console.log(`Using default URL: ${baseUrl}`);
       }
       const response = await fetch(`${baseUrl}/api/jobitem.php`, {
@@ -606,7 +606,7 @@ const ItemsAnimation = ({
         baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
-        baseUrl = "https://ogfieldticket.com";
+        baseUrl = "https://test.ogfieldticket.com";
         console.log(`Using default URL: ${baseUrl}`);
       }
 
@@ -656,7 +656,7 @@ const ItemsAnimation = ({
         const subdomainPart = parts.shift();
         baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
       } else {
-        baseUrl = "https://ogfieldticket.com";
+        baseUrl = "https://test.ogfieldticket.com";
       }
 
       const response = await fetch(`${baseUrl}/api/jobitem.php`, {
@@ -689,7 +689,7 @@ const ItemsAnimation = ({
     console.log(itemId);
     const baseUrl = subdomain
       ? `https://${subdomain}.ogfieldticket.com`
-      : "https://ogfieldticket.com";
+      : "https://test.ogfieldticket.com";
 
     const data = {
       JobItemID: itemId.JobItemID,
@@ -726,7 +726,7 @@ const ItemsAnimation = ({
         baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
         console.log(`Using subdomain URL: ${baseUrl}`);
       } else {
-        baseUrl = "https://ogfieldticket.com";
+        baseUrl = "https://test.ogfieldticket.com";
         console.log(`Using default URL: ${baseUrl}`);
       }
       await axios.patch(
