@@ -53,15 +53,10 @@ self.addEventListener("fetch", (event) => {
     );
   } else if (["POST", "DELETE", "PATCH"].includes(event.request.method)) {
     event.respondWith(
-      fetch(event.request.clone()).catch(() => {
-        return event.request
-          .clone()
-          .text()
-          .then((body) => {
-            return enqueueRequest(event.request, body).then(() => {
-              return new Response(null, { status: 202, statusText: "Queued" });
-            });
-          });
+      fetch(event.request.clone()).catch(async () => {
+        const body = await event.request.clone().text();
+        await enqueueRequest(event.request, body);
+        return new Response(null, { status: 202, statusText: "Queued" });
       })
     );
   }
