@@ -347,12 +347,7 @@ const ViewFieldTicket = () => {
       const parts = hostname.split(".");
       let baseUrl;
 
-      if (parts.length > 2) {
-        const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
-      } else {
-        baseUrl = "https://test.ogfieldticket.com";
-      }
+      baseUrl = "https://test.ogfieldticket.com";
 
       localStorage.setItem("currentTicket", JSON.stringify(updatedTicket));
 
@@ -437,14 +432,7 @@ const ViewFieldTicket = () => {
       const parts = hostname.split(".");
       let baseUrl;
 
-      if (parts.length > 2) {
-        const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
-        console.log(`Using subdomain URL: ${baseUrl}`);
-      } else {
-        baseUrl = "https://test.ogfieldticket.com";
-        console.log(`Using default URL: ${baseUrl}`);
-      }
+      baseUrl = "https://test.ogfieldticket.com";
 
       if (navigator.onLine) {
         const response = await fetch(
@@ -516,14 +504,8 @@ const ViewFieldTicket = () => {
       const parts = hostname.split(".");
       let baseUrl;
 
-      if (parts.length > 2) {
-        const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
-        console.log(`Using subdomain URL: ${baseUrl}`);
-      } else {
-        baseUrl = "https://test.ogfieldticket.com";
-        console.log(`Using default URL: ${baseUrl}`);
-      }
+      baseUrl = "https://test.ogfieldticket.com";
+
       const encodedImageDirectory = encodeURIComponent(
         imageDirectory.replace(/^\.\.\//, "")
       );
@@ -615,14 +597,7 @@ const ViewFieldTicket = () => {
       const parts = hostname.split(".");
       let baseUrl;
 
-      if (parts.length > 2) {
-        const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
-        console.log(`Using subdomain URL: ${baseUrl}`);
-      } else {
-        baseUrl = "https://test.ogfieldticket.com";
-        console.log(`Using default URL: ${baseUrl}`);
-      }
+      baseUrl = "https://test.ogfieldticket.com";
 
       const response = await fetch(
         `${baseUrl}/api/tickets.php?ticket=${ticket.Ticket}`,
