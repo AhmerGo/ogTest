@@ -32,12 +32,7 @@ self.addEventListener("fetch", (event) => {
         } else {
           try {
             const networkResponse = await fetch(event.request);
-            if (
-              networkResponse &&
-              networkResponse.status === 200 &&
-              (networkResponse.type === "basic" ||
-                networkResponse.type === "cors")
-            ) {
+            if (networkResponse && networkResponse.status === 200) {
               const responseToCache = networkResponse.clone();
               const cache = await caches.open(CACHE_NAME);
               cache.put(event.request, responseToCache);
@@ -56,7 +51,10 @@ self.addEventListener("fetch", (event) => {
         return event.request
           .clone()
           .text()
-          .then((body) => enqueueRequest(event.request, body));
+          .then((body) => enqueueRequest(event.request, body))
+          .then(
+            () => new Response(null, { status: 202, statusText: "Accepted" })
+          );
       })
     );
   }
