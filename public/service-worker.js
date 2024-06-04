@@ -103,6 +103,9 @@ async function enqueueRequest(request, body) {
   const store = tx.objectStore(QUEUE_NAME);
   await store.put(queuedRequest);
   await tx.done;
+
+  // Immediately try to replay the queued requests
+  replayQueuedRequests();
 }
 
 self.addEventListener("sync", (event) => {
