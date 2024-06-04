@@ -1,6 +1,9 @@
 importScripts("/idb.js");
 
 const CACHE_NAME = "my-app-cache-v1";
+const DB_NAME = "request-queue";
+const STORE_NAME = "requests";
+
 const urlsToCache = [
   "/",
   "/index.html",
@@ -77,9 +80,14 @@ self.addEventListener("activate", (event) => {
 });
 
 async function enqueueRequest(request, body) {
-  const db = await idb.openDB("request-queue", 1, {
+  const db = await idb.openDB(DB_NAME, 1, {
     upgrade(db) {
-      db.createObjectStore("requests", { keyPath: "id", autoIncrement: true });
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
     },
   });
 
@@ -90,8 +98,8 @@ async function enqueueRequest(request, body) {
     body: body,
   };
 
-  const tx = db.transaction("requests", "readwrite");
-  await tx.objectStore("requests").add(queuedRequest);
+  const tx = db.transaction(STORE_NAME, "readwrite");
+  await tx.objectStore(STORE_NAME).add(queuedRequest);
   await tx.done;
 
   if ("sync" in self.registration) {
@@ -108,9 +116,9 @@ self.addEventListener("sync", (event) => {
 });
 
 async function replayQueuedRequests() {
-  const db = await idb.openDB("request-queue", 1);
-  const tx = db.transaction("requests", "readonly");
-  const store = tx.objectStore("requests");
+  const db = await idb.openDB(DB_NAME, 1);
+  const tx = db.transaction(STORE_NAME, "readonly");
+  const store = tx.objectStore(STORE_NAME);
   const requests = await store.getAll();
 
   for (const queuedRequest of requests) {
@@ -128,8 +136,8 @@ async function replayQueuedRequests() {
     try {
       const networkResponse = await fetch(queuedRequest.url, fetchOptions);
       if (networkResponse.ok) {
-        const txDelete = db.transaction("requests", "readwrite");
-        await txDelete.objectStore("requests").delete(queuedRequest.id);
+        const txDelete = db.transaction(STORE_NAME, "readwrite");
+        await txDelete.objectStore(STORE_NAME).delete(queuedRequest.id);
         await txDelete.done;
       }
     } catch (error) {
