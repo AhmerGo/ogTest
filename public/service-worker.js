@@ -82,7 +82,12 @@ self.addEventListener("activate", (event) => {
 async function enqueueRequest(request) {
   const db = await idb.openDB("request-queue", 1, {
     upgrade(db) {
-      db.createObjectStore("requests", { keyPath: "id", autoIncrement: true });
+      if (!db.objectStoreNames.contains("requests")) {
+        db.createObjectStore("requests", {
+          keyPath: "id",
+          autoIncrement: true,
+        });
+      }
     },
   });
 
@@ -100,7 +105,6 @@ async function enqueueRequest(request) {
   await tx.objectStore("requests").add(queuedRequest);
   await tx.complete;
 }
-
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "REPLAY_QUEUED_REQUESTS") {
     replayQueuedRequests();
