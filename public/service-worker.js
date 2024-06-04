@@ -1,3 +1,5 @@
+importScripts("idb.js");
+
 const CACHE_NAME = "my-app-cache-v1";
 const QUEUE_NAME = "request-queue";
 const urlsToCache = [
@@ -20,7 +22,7 @@ self.addEventListener("install", (event) => {
       return cache.addAll(urlsToCache);
     })
   );
-  self.skipWaiting(); // Ensures the service worker activates immediately
+  self.skipWaiting();
 });
 
 self.addEventListener("fetch", (event) => {
@@ -53,11 +55,15 @@ self.addEventListener("fetch", (event) => {
     );
   } else if (["POST", "DELETE", "PATCH"].includes(event.request.method)) {
     event.respondWith(
-      fetch(event.request.clone()).catch(async () => {
-        const body = await event.request.clone().text();
-        await enqueueRequest(event.request, body);
-        return new Response(null, { status: 202, statusText: "Queued" });
-      })
+      (async () => {
+        if (!navigator.onLine) {
+          const body = await event.request.clone().text();
+          await enqueueRequest(event.request, body);
+          return new Response(null, { status: 202, statusText: "Queued" });
+        } else {
+          return fetch(event.request);
+        }
+      })()
     );
   }
 });
@@ -75,25 +81,28 @@ self.addEventListener("activate", (event) => {
       );
     })
   );
-  self.clients.claim(); // Ensures the service worker takes control immediately
+  self.clients.claim();
 });
 
 async function enqueueRequest(request, body) {
+  const db = await idb.openDB("my-app-db", 1, {
+    upgrade(db) {
+      db.createObjectStore(QUEUE_NAME, { keyPath: "id" });
+    },
+  });
+
   const queuedRequest = {
+    id: new Date().toISOString(),
     url: request.url,
     method: request.method,
     headers: [...request.headers.entries()],
     body: body,
   };
 
-  const cache = await caches.open(QUEUE_NAME);
-  const id = new Date().toISOString();
-  await cache.put(
-    new Request(id, { method: "GET" }),
-    new Response(JSON.stringify(queuedRequest))
-  );
-  // Register sync for the queued request
-  self.registration.sync.register("replay-queued-requests");
+  const tx = db.transaction(QUEUE_NAME, "readwrite");
+  const store = tx.objectStore(QUEUE_NAME);
+  await store.put(queuedRequest);
+  await tx.done;
 }
 
 self.addEventListener("sync", (event) => {
@@ -102,30 +111,40 @@ self.addEventListener("sync", (event) => {
   }
 });
 
-async function replayQueuedRequests() {
-  const cache = await caches.open(QUEUE_NAME);
-  const requests = await cache.keys();
-  for (const request of requests) {
-    const response = await cache.match(request);
-    const queuedRequest = await response.json();
-    const headers = new Headers(queuedRequest.headers);
-    headers.set("Content-Type", "application/json"); // Set the Content-Type header
+self.addEventListener("periodicsync", (event) => {
+  if (event.tag === "replay-queued-requests") {
+    event.waitUntil(replayQueuedRequests());
+  }
+});
 
+async function replayQueuedRequests() {
+  const db = await idb.openDB("my-app-db", 1);
+
+  const tx = db.transaction(QUEUE_NAME, "readonly");
+  const store = tx.objectStore(QUEUE_NAME);
+  const requests = await store.getAll();
+  await tx.done;
+
+  for (const queuedRequest of requests) {
+    const headers = new Headers(queuedRequest.headers);
     const fetchOptions = {
       method: queuedRequest.method,
       headers: headers,
-      body: queuedRequest.body, // Use the stored JSON string body
+      body: queuedRequest.body,
     };
 
     try {
-      const networkResponse = await fetch(queuedRequest.url, fetchOptions);
-      if (networkResponse.ok) {
-        await cache.delete(request);
+      const response = await fetch(queuedRequest.url, fetchOptions);
+      if (response.ok) {
+        const tx = db.transaction(QUEUE_NAME, "readwrite");
+        const store = tx.objectStore(QUEUE_NAME);
+        await store.delete(queuedRequest.id);
+        await tx.done;
       }
     } catch (error) {
       console.error("Replay queued request failed", error);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Delay before next request
+    await new Promise((resolve) => setTimeout(resolve, 100));
   }
 }
