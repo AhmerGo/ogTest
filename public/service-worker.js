@@ -1,6 +1,6 @@
 importScripts("/idb.js");
 
-const CACHE_NAME = "my-app-cache-v1";
+const CACHE_NAME = "my-app-cache-v1.0.1"; // Updated cache name with version
 const DB_NAME = "request-queue";
 const STORE_NAME = "requests";
 
@@ -22,7 +22,7 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
   );
-  self.skipWaiting();
+  self.skipWaiting(); // Force the SW to take control immediately
 });
 
 self.addEventListener("fetch", (event) => {
