@@ -13,6 +13,9 @@ const RootComponent = () => {
   useEffect(() => {
     const handleOnline = () => {
       setShowReloadModal(true);
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.sync.register("replay-queued-requests");
+      });
     };
 
     window.addEventListener("online", handleOnline);
@@ -48,4 +51,21 @@ const RootComponent = () => {
 
 root.render(<RootComponent />);
 
-serviceWorker.register();
+serviceWorker.register({
+  onUpdate: (registration) => {
+    const waitingServiceWorker = registration.waiting;
+
+    if (waitingServiceWorker) {
+      waitingServiceWorker.addEventListener("statechange", (event) => {
+        if (event.target.state === "activated") {
+          console.log("New service worker activated.");
+        }
+      });
+
+      waitingServiceWorker.postMessage({ type: "SKIP_WAITING" });
+    }
+  },
+  onSuccess: (registration) => {
+    console.log("Service Worker registered successfully:", registration);
+  },
+});

@@ -1,7 +1,6 @@
-importScripts("idb.js");
+importScripts("/idb.js");
 
 const CACHE_NAME = "my-app-cache-v1";
-const QUEUE_NAME = "request-queue";
 const urlsToCache = [
   "/",
   "/index.html",
@@ -55,15 +54,16 @@ self.addEventListener("fetch", (event) => {
     );
   } else if (["POST", "DELETE", "PATCH"].includes(event.request.method)) {
     event.respondWith(
-      (async () => {
-        if (!navigator.onLine) {
-          const body = await event.request.clone().text();
-          await enqueueRequest(event.request, body);
-          return new Response(null, { status: 202, statusText: "Queued" });
-        } else {
-          return fetch(event.request);
-        }
-      })()
+      fetch(event.request.clone()).catch(() => {
+        return event.request
+          .clone()
+          .text()
+          .then((body) => {
+            return enqueueRequest(event.request, body).then(() => {
+              return new Response(null, { status: 202, statusText: "Queued" });
+            });
+          });
+      })
     );
   }
 });
@@ -85,27 +85,28 @@ self.addEventListener("activate", (event) => {
 });
 
 async function enqueueRequest(request, body) {
-  const db = await idb.openDB("my-app-db", 1, {
+  const db = await idb.openDB("request-queue", 1, {
     upgrade(db) {
-      db.createObjectStore(QUEUE_NAME, { keyPath: "id" });
+      db.createObjectStore("requests", { keyPath: "id", autoIncrement: true });
     },
   });
 
   const queuedRequest = {
-    id: new Date().toISOString(),
     url: request.url,
     method: request.method,
     headers: [...request.headers.entries()],
     body: body,
   };
 
-  const tx = db.transaction(QUEUE_NAME, "readwrite");
-  const store = tx.objectStore(QUEUE_NAME);
-  await store.put(queuedRequest);
-  await tx.done;
+  const tx = db.transaction("requests", "readwrite");
+  await tx.objectStore("requests").add(queuedRequest);
+  await tx.complete;
 
-  // Immediately try to replay the queued requests
-  replayQueuedRequests();
+  if ("sync" in self.registration) {
+    self.registration.sync.register("replay-queued-requests");
+  } else {
+    replayQueuedRequests(); // Fallback for browsers without Background Sync
+  }
 }
 
 self.addEventListener("sync", (event) => {
@@ -114,22 +115,16 @@ self.addEventListener("sync", (event) => {
   }
 });
 
-self.addEventListener("periodicsync", (event) => {
-  if (event.tag === "replay-queued-requests") {
-    event.waitUntil(replayQueuedRequests());
-  }
-});
-
 async function replayQueuedRequests() {
-  const db = await idb.openDB("my-app-db", 1);
-
-  const tx = db.transaction(QUEUE_NAME, "readonly");
-  const store = tx.objectStore(QUEUE_NAME);
+  const db = await idb.openDB("request-queue", 1);
+  const tx = db.transaction("requests", "readonly");
+  const store = tx.objectStore("requests");
   const requests = await store.getAll();
-  await tx.done;
 
   for (const queuedRequest of requests) {
     const headers = new Headers(queuedRequest.headers);
+    headers.set("Content-Type", "application/json");
+
     const fetchOptions = {
       method: queuedRequest.method,
       headers: headers,
@@ -137,17 +132,16 @@ async function replayQueuedRequests() {
     };
 
     try {
-      const response = await fetch(queuedRequest.url, fetchOptions);
-      if (response.ok) {
-        const tx = db.transaction(QUEUE_NAME, "readwrite");
-        const store = tx.objectStore(QUEUE_NAME);
-        await store.delete(queuedRequest.id);
-        await tx.done;
+      const networkResponse = await fetch(queuedRequest.url, fetchOptions);
+      if (networkResponse.ok) {
+        const txDelete = db.transaction("requests", "readwrite");
+        await txDelete.objectStore("requests").delete(queuedRequest.id);
+        await txDelete.complete;
       }
     } catch (error) {
       console.error("Replay queued request failed", error);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Delay before next request
   }
 }
