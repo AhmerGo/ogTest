@@ -5,10 +5,12 @@ import App from "./App";
 import { BrowserRouter as Router } from "react-router-dom";
 import * as serviceWorker from "./serviceWorker";
 import ConfirmModal from "./components/ConfirmModal";
+import LoadingModal from "./components/LoadingModal";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const RootComponent = () => {
   const [showReloadModal, setShowReloadModal] = useState(false);
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -26,8 +28,11 @@ const RootComponent = () => {
   }, []);
 
   const handleReloadConfirm = () => {
-    window.location.reload();
-    setShowReloadModal(false);
+    setShowLoadingModal(true);
+    setTimeout(() => {
+      window.location.reload();
+      setShowLoadingModal(false);
+    }, 15000);
   };
 
   const handleReloadCancel = () => {
@@ -44,6 +49,7 @@ const RootComponent = () => {
           onCancel={handleReloadCancel}
           message="You are back online. Reload the page to see the latest updates."
         />
+        <LoadingModal show={showLoadingModal} />
       </Router>
     </React.StrictMode>
   );
