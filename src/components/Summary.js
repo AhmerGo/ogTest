@@ -346,6 +346,7 @@ const ViewFieldTicket = () => {
       localStorage.setItem("currentTicket", JSON.stringify(updatedTicket));
       const storedTickets = JSON.parse(localStorage.getItem("tickets")) || [];
       const patchData = {
+        ...updatedTicket,
         TicketDate: ticket.TicketDate,
         LeaseName: ticket.LeaseName,
         WellID: ticket.WellID,
