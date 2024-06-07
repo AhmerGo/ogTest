@@ -55,7 +55,7 @@ function CreateFieldTicket() {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
       } else {
         baseUrl = "https://test.ogfieldticket.com";
       }
@@ -96,7 +96,7 @@ function CreateFieldTicket() {
 
           if (parts.length > 2) {
             const subdomainPart = parts.shift();
-            baseUrl = `https://${subdomainPart}.ogpumper.net`;
+            baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
           } else {
             baseUrl = "https://test.ogfieldticket.com";
           }
@@ -128,7 +128,7 @@ function CreateFieldTicket() {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogpumper.net`;
+        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
       } else {
         baseUrl = "https://test.ogfieldticket.com";
       }
