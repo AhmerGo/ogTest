@@ -10,6 +10,7 @@ import { ThemeProvider } from "./components/ThemeContext";
 import Summary from "./components/Summary";
 import JobForm from "./components/JobTypeForm";
 import Details from "./components/Details";
+import MasterList from "./components/ItemMasterList";
 import { UserProvider } from "./components/UserContext";
 import Admin from "./components/admin";
 function App() {
@@ -71,6 +72,14 @@ function App() {
             element={
               <Layout>
                 <Admin />
+              </Layout>
+            }
+          />
+          <Route
+            path="/master-list"
+            element={
+              <Layout>
+                <MasterList />
               </Layout>
             }
           />

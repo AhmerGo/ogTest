@@ -102,7 +102,6 @@ const TicketItem = React.memo(
               <FontAwesomeIcon icon={faBriefcase} className="mr-2" fixedWidth />
               <span> {ticket.JobDescription}</span>
             </div>
-
             {userRole !== "P" && (
               <div className="flex items-center justify-center md:justify-start">
                 <FontAwesomeIcon icon={faUser} className="mr-2" fixedWidth />

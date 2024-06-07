@@ -27,10 +27,8 @@ function CreateFieldTicket() {
       const parts = hostname.split(".");
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        console.log(`sub domain ${subdomainPart}`);
         setSubdomain(subdomainPart);
       } else {
-        console.log(`sub domain ${parts}`);
         setSubdomain("");
       }
     };
@@ -57,11 +55,9 @@ function CreateFieldTicket() {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
-        console.log(`Using subdomain URL: ${baseUrl}`);
+        baseUrl = `https://${subdomainPart}.ogpumper.net`;
       } else {
         baseUrl = "https://test.ogfieldticket.com";
-        console.log(`Using default URL: ${baseUrl}`);
       }
       const response = await fetch(`${baseUrl}/api/leases.php`);
       let data = await response.json();
@@ -100,11 +96,9 @@ function CreateFieldTicket() {
 
           if (parts.length > 2) {
             const subdomainPart = parts.shift();
-            baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
-            console.log(`Using subdomain URL: ${baseUrl}`);
+            baseUrl = `https://${subdomainPart}.ogpumper.net`;
           } else {
             baseUrl = "https://test.ogfieldticket.com";
-            console.log(`Using default URL: ${baseUrl}`);
           }
 
           const response = await fetch(
@@ -134,11 +128,9 @@ function CreateFieldTicket() {
 
       if (parts.length > 2) {
         const subdomainPart = parts.shift();
-        baseUrl = `https://${subdomainPart}.ogfieldticket.com`;
-        console.log(`Using subdomain URL: ${baseUrl}`);
+        baseUrl = `https://${subdomainPart}.ogpumper.net`;
       } else {
         baseUrl = "https://test.ogfieldticket.com";
-        console.log(`Using default URL: ${baseUrl}`);
       }
 
       const response = await fetch(`${baseUrl}/api/jobs.php`);
