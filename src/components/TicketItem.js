@@ -9,6 +9,7 @@ import {
   faBriefcase,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
+import { parseISO, format } from "date-fns";
 
 const TicketItem = React.memo(
   ({ ticket, index, theme, onClick, searchQuery }) => {
@@ -19,7 +20,11 @@ const TicketItem = React.memo(
 
     const { userRole } = useUser();
     const [year, month, day] = ticket.TicketDate.split("-");
-    const localDate = new Date(year, month - 1, day);
+    const localDate = useMemo(() => {
+      const date = new Date(ticket.TicketDate);
+      date.setMinutes(date.getMinutes() + date.getTimezoneOffset());
+      return date;
+    }, [ticket.TicketDate]);
 
     const formattedDate = useMemo(
       () =>

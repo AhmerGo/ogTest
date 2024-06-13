@@ -7,6 +7,7 @@ import {
   faBriefcase,
   faTachometerAlt,
   faList,
+  faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import Modal from "react-modal";
 import { useTheme } from "./ThemeContext";
@@ -14,6 +15,7 @@ import JobListPage from "./JobTypeForm";
 import Leases from "./Leases";
 import ControlUsers from "./ControlUsers";
 import MasterList from "./ItemMasterList"; // Import the MasterList component
+import Charts from "./Charts"; // Import the Charts component
 
 Modal.setAppElement("#root");
 
@@ -97,20 +99,68 @@ const Admin = () => {
               className={`px-6 py-4 rounded-lg flex items-center gap-3 cursor-pointer transition-colors duration-200 ${sidePanelHoverClass} ${
                 activePanel === "leases" ? activePanelClass : ""
               }`}
-              onClick={() => handleChangePanel("leases")}
+              onClick={() => handleChangePanel("leases", "leaseList")}
             >
               <FontAwesomeIcon icon={faFileContract} className="text-xl" />
               <span className="text-lg font-medium">Leases</span>
             </li>
+            {activePanel === "leases" && (
+              <ul className="pl-8 space-y-2">
+                <li
+                  className={`px-6 py-4 rounded-lg flex items-center gap-3 cursor-pointer transition-colors duration-200 ${sidePanelHoverClass} ${
+                    activeSubPanel === "leaseList" ? activePanelClass : ""
+                  }`}
+                  onClick={() => handleChangePanel("leases", "leaseList")}
+                >
+                  <FontAwesomeIcon icon={faList} className="text-lg" />
+                  <span className="text-md">Lease List</span>
+                </li>
+              </ul>
+            )}
             <li
               className={`px-6 py-4 rounded-lg flex items-center gap-3 cursor-pointer transition-colors duration-200 ${sidePanelHoverClass} ${
                 activePanel === "users" ? activePanelClass : ""
               }`}
-              onClick={() => handleChangePanel("users")}
+              onClick={() => handleChangePanel("users", "userList")}
             >
               <FontAwesomeIcon icon={faUsers} className="text-xl" />
               <span className="text-lg font-medium">Users</span>
             </li>
+            {activePanel === "users" && (
+              <ul className="pl-8 space-y-2">
+                <li
+                  className={`px-6 py-4 rounded-lg flex items-center gap-3 cursor-pointer transition-colors duration-200 ${sidePanelHoverClass} ${
+                    activeSubPanel === "userList" ? activePanelClass : ""
+                  }`}
+                  onClick={() => handleChangePanel("users", "userList")}
+                >
+                  <FontAwesomeIcon icon={faList} className="text-lg" />
+                  <span className="text-md">User List</span>
+                </li>
+              </ul>
+            )}
+            <li
+              className={`px-6 py-4 rounded-lg flex items-center gap-3 cursor-pointer transition-colors duration-200 ${sidePanelHoverClass} ${
+                activePanel === "charts" ? activePanelClass : ""
+              }`}
+              onClick={() => handleChangePanel("charts", "chartsView")}
+            >
+              <FontAwesomeIcon icon={faChartLine} className="text-xl" />
+              <span className="text-lg font-medium">Charts</span>
+            </li>
+            {activePanel === "charts" && (
+              <ul className="pl-8 space-y-2">
+                <li
+                  className={`px-6 py-4 rounded-lg flex items-center gap-3 cursor-pointer transition-colors duration-200 ${sidePanelHoverClass} ${
+                    activeSubPanel === "chartsView" ? activePanelClass : ""
+                  }`}
+                  onClick={() => handleChangePanel("charts", "chartsView")}
+                >
+                  <FontAwesomeIcon icon={faList} className="text-lg" />
+                  <span className="text-md">Charts View</span>
+                </li>
+              </ul>
+            )}
           </ul>
         </animated.div>
       </div>
@@ -122,11 +172,13 @@ const Admin = () => {
             <JobListPage />
           ) : activePanel === "jobs" && activeSubPanel === "masterList" ? (
             <MasterList />
-          ) : activePanel === "leases" ? (
+          ) : activePanel === "leases" && activeSubPanel === "leaseList" ? (
             <Leases />
-          ) : (
+          ) : activePanel === "users" && activeSubPanel === "userList" ? (
             <ControlUsers />
-          )}
+          ) : activePanel === "charts" && activeSubPanel === "chartsView" ? (
+            <Charts />
+          ) : null}
         </animated.div>
       </div>
     </div>

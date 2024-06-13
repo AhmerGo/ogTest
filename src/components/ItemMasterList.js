@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useSpring, animated } from "react-spring";
 import Modal from "react-modal";
 import axios from "axios";
 import { useTheme } from "./ThemeContext";
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faSave, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 Modal.setAppElement("#root");
 
@@ -16,8 +19,8 @@ const MasterList = () => {
   const [formData, setFormData] = useState({
     item_description: "",
     uom: "",
-    use_quantity: "",
-    use_cost: "",
+    use_quantity: "N",
+    use_cost: "N",
   });
 
   useEffect(() => {
@@ -89,11 +92,7 @@ const MasterList = () => {
   };
 
   const tableClass =
-    theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black";
-  const headerClass =
-    theme === "dark" ? "bg-gray-800 text-white" : "bg-gray-200 text-black";
-  const rowClass = theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100";
-  const borderClass = theme === "dark" ? "border-gray-700" : "border-gray-200";
+    theme === "dark" ? "ag-theme-alpine-dark" : "ag-theme-alpine";
   const modalBgClass =
     theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-black";
   const inputClass =
@@ -101,73 +100,89 @@ const MasterList = () => {
       ? "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-900 text-white"
       : "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline";
 
+  const columnDefs = [
+    {
+      headerName: "Item ID",
+      field: "ItemID",
+      pinned: "left",
+      editable: false,
+      cellRenderer: "agGroupCellRenderer",
+    },
+    {
+      headerName: "Description",
+      field: "ItemDescription",
+      editable: true,
+      cellClass: "custom-cell",
+    },
+    { headerName: "UOM", field: "UOM", editable: true },
+    {
+      headerName: "Use Qty",
+      field: "UseQuantity",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: { values: ["Y", "N"] },
+    },
+    {
+      headerName: "Use Cost",
+      field: "UseCost",
+      editable: true,
+      cellEditor: "agSelectCellEditor",
+      cellEditorParams: { values: ["Y", "N"] },
+    },
+  ];
+
+  const onCellValueChanged = async (params) => {
+    const updatedData = {
+      item_id: params.data.ItemID,
+      item_description: params.data.ItemDescription,
+      uom: params.data.UOM,
+      use_quantity: params.data.UseQuantity,
+      use_cost: params.data.UseCost,
+    };
+
+    try {
+      await axios.patch(
+        "https://test.ogfieldticket.com/api/jobitem.php",
+        updatedData
+      );
+      fetchData();
+    } catch (error) {
+      console.error("Error updating item", error);
+    }
+  };
+
   return (
     <animated.div style={tableAnimation} className="mt-8">
       <div
-        className={`bg-gradient-to-r from-gray-800 to-gray-900 text-white shadow-xl rounded-lg overflow-hidden ${tableClass}`}
+        className={`bg-gradient-to-r ${
+          theme === "dark"
+            ? "from-gray-900 to-gray-800 text-white"
+            : "from-white to-gray-100 text-black"
+        } shadow-xl rounded-lg overflow-hidden ${tableClass}`}
       >
-        <div className="p-5 text-center">
-          <h2 className="text-2xl font-bold">Master List</h2>
+        <div
+          className={`p-5 text-center bg-gray-50 dark:bg-gray-700 dark:text-white ag-theme-alpine ${tableClass}`}
+        >
+          <h2 className="text-4xl font-bold">Master List</h2>
+        </div>{" "}
+        <div
+          className={`ag-theme-alpine min-w-full ${tableClass}`}
+          style={{ height: 800 }}
+        >
+          <AgGridReact
+            columnDefs={columnDefs}
+            rowData={data}
+            context={{ openModal }}
+            defaultColDef={{
+              flex: 1,
+              minWidth: 100,
+              sortable: true,
+              filter: true,
+              editable: true,
+            }}
+            onCellValueChanged={onCellValueChanged}
+          />
         </div>
-        <table className={`min-w-full ${tableClass}`}>
-          <thead>
-            <tr className={headerClass}>
-              <th className="w-1/6 py-3 px-4 uppercase font-semibold text-sm">
-                Item ID
-              </th>
-              <th className="w-1/2 py-3 px-4 uppercase font-semibold text-sm">
-                Description
-              </th>
-              <th className="w-1/6 py-3 px-4 uppercase font-semibold text-sm">
-                UOM
-              </th>
-              <th className="w-1/12 py-3 px-4 uppercase font-semibold text-sm">
-                Use Qty
-              </th>
-              <th className="w-1/12 py-3 px-4 uppercase font-semibold text-sm">
-                Use Cost
-              </th>
-              <th className="w-1/12 py-3 px-4 uppercase font-semibold text-sm">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((item) => (
-              <tr
-                key={item.ItemID}
-                className={`transition duration-300 ease-in-out transform hover:scale-105 ${rowClass}`}
-              >
-                <td className={`py-3 px-4 border-b ${borderClass}`}>
-                  {item.ItemID}
-                </td>
-                <td className={`py-3 px-4 border-b ${borderClass}`}>
-                  {item.ItemDescription}
-                </td>
-                <td className={`py-3 px-4 border-b ${borderClass}`}>
-                  {item.UOM}
-                </td>
-                <td className={`py-3 px-4 border-b ${borderClass}`}>
-                  {item.UseQuantity}
-                </td>
-                <td className={`py-3 px-4 border-b ${borderClass}`}>
-                  {item.UseCost}
-                </td>
-                <td className={`py-3 px-4 border-b ${borderClass}`}>
-                  <button
-                    className="text-blue-500 hover:text-blue-700 transition duration-300 ease-in-out transform hover:scale-125 mr-2"
-                    onClick={() => openModal(item)}
-                  >
-                    <FontAwesomeIcon icon={faEdit} />
-                  </button>
-                  <button className="text-red-500 hover:text-red-700 transition duration-300 ease-in-out transform hover:scale-125">
-                    <FontAwesomeIcon icon={faTrash} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
 
       <Modal
@@ -177,9 +192,9 @@ const MasterList = () => {
         overlayClassName="fixed inset-0 bg-black bg-opacity-50"
       >
         <div
-          className={`rounded-lg overflow-hidden shadow-xl max-w-md w-full p-6 ${modalBgClass}`}
+          className={`rounded-lg overflow-hidden shadow-2xl max-w-md w-full p-6 ${modalBgClass}`}
         >
-          <h2 className="text-2xl mb-4">Edit Item</h2>
+          <h2 className="text-3xl mb-4 font-semibold">Edit Item</h2>
           {selectedItem && (
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
@@ -218,14 +233,16 @@ const MasterList = () => {
                 >
                   Use Quantity
                 </label>
-                <input
+                <select
                   id="use_quantity"
                   name="use_quantity"
-                  type="text"
                   value={formData.use_quantity}
                   onChange={handleChange}
                   className={inputClass}
-                />
+                >
+                  <option value="Y">Yes</option>
+                  <option value="N">No</option>
+                </select>
               </div>
               <div className="mb-4">
                 <label
@@ -234,20 +251,23 @@ const MasterList = () => {
                 >
                   Use Cost
                 </label>
-                <input
+                <select
                   id="use_cost"
                   name="use_cost"
-                  type="text"
                   value={formData.use_cost}
                   onChange={handleChange}
                   className={inputClass}
-                />
+                >
+                  <option value="Y">Yes</option>
+                  <option value="N">No</option>
+                </select>
               </div>
               <div className="flex items-center justify-between">
                 <button
                   type="submit"
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 >
+                  <FontAwesomeIcon icon={faSave} className="mr-2" />
                   Save
                 </button>
                 <button
@@ -255,13 +275,21 @@ const MasterList = () => {
                   onClick={closeModal}
                   className="ml-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 >
-                  Cancel
+                  <FontAwesomeIcon icon={faTimes} className="mr-2" />
+                  Cancel{" "}
                 </button>
               </div>
             </form>
           )}
         </div>
       </Modal>
+
+      <style jsx>{`
+        .custom-cell {
+          font-weight: bold;
+          font-style: italic;
+        }
+      `}</style>
     </animated.div>
   );
 };

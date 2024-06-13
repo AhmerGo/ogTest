@@ -20,6 +20,9 @@ function CreateFieldTicket() {
   const [wells, setWells] = useState([]);
   const [ticketTypes, setTicketTypes] = useState([]);
   const [subdomain, setSubdomain] = useState("");
+  const handleDateChange = (date) => {
+    setTicketDate(date);
+  };
 
   useEffect(() => {
     const extractSubdomain = () => {
@@ -251,8 +254,8 @@ function CreateFieldTicket() {
               </label>
               <DatePicker
                 selected={ticketDate}
-                onChange={(date) => setTicketDate(date)}
-                maxDate={today}
+                onChange={handleDateChange}
+                maxDate={new Date()}
                 className={`form-input w-full px-4 py-2 rounded-md focus:outline-none focus:ring-2 transition-colors duration-500 ${
                   theme === "dark"
                     ? "bg-gray-800 border border-gray-700 focus:ring-gray-600 text-white"

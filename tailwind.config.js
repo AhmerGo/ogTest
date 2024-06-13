@@ -4,6 +4,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        "alpine-bg": "#f8f9fa",
+        "alpine-bg-dark": "#2f3542",
+        "alpine-text": "#212529",
+        "alpine-text-dark": "#f1f3f5",
         "blue-500": "#4299E1",
         "purple-500": "#9F7AEA",
         "gray-700": "#4A5568",
