@@ -75,14 +75,6 @@ function App() {
               </Layout>
             }
           />
-          <Route
-            path="/master-list"
-            element={
-              <Layout>
-                <MasterList />
-              </Layout>
-            }
-          />
         </Routes>
       </ThemeProvider>
     </UserProvider>

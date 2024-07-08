@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { animated } from "react-spring";
 import Modal from "react-modal";
-import { useTheme } from "./ThemeContext";
 
 const PrintSection = ({
   userRole,
@@ -13,14 +12,14 @@ const PrintSection = ({
 }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [printSelections, setPrintSelections] = useState({
-    head: true,
-    items: true,
+    ticketAndNote: true,
     image: true,
   });
 
   const openPrintModal = () => setModalIsOpen(true);
 
   const closePrintModal = () => setModalIsOpen(false);
+
   const handleCheckboxChange = (e) =>
     setPrintSelections({
       ...printSelections,
@@ -30,6 +29,7 @@ const PrintSection = ({
   const handlePrint = () => {
     const isSinglePageLayout =
       ticket.Items.length <= 9 && uploadedImages.length <= 1;
+
     const printWindow = window.open("", "", "height=600,width=800");
 
     printWindow.document.write(`
@@ -148,10 +148,10 @@ const PrintSection = ({
             </div>
             <div class="content">
               ${
-                printSelections.head
+                printSelections.ticketAndNote
                   ? `
                 <div class="section">
-                  <h2>Ticket Information</h2>
+                  <h2>Ticket Information & Items</h2>
                   <div><strong>Date:</strong> ${new Date(
                     ticket.TicketDate
                   ).toLocaleDateString()}</div>
@@ -166,30 +166,34 @@ const PrintSection = ({
                     ticket.Ticket || "N/A"
                   }</div>
                   <div><strong>Billed:</strong> ${ticket.Billed || "N/A"}</div>
+                  <div class="net-cost">
+                    Net Cost: $${ticket.Items?.reduce(
+                      (sum, item) => sum + (Number(item.totalCost) || 0),
+                      0
+                    ).toFixed(2)}
+                  </div>
+                  <div class="items">
+                    ${ticket?.Items?.map(
+                      (item) => `
+                      <div class="item">
+                        <h4>${item.ItemDescription}</h4>
+                        <p>Qty: ${item.Quantity}</p>
+                        <p>Total Cost: $${item.totalCost}</p>
+                      </div>
+                    `
+                    ).join("")}
+                  </div>
                 </div>
-              `
-                  : ""
-              }
-              ${
-                printSelections.items
-                  ? `
-                <div class="section net-cost">
-                  Net Cost: $${ticket.Items?.reduce(
-                    (sum, item) => sum + (Number(item.totalCost) || 0),
-                    0
-                  ).toFixed(2)}
-                </div>
-                <div class="items">
-                  ${ticket?.Items?.map(
-                    (item) => `
-                    <div class="item">
-                      <h4>${item.ItemDescription}</h4>
-                      <p>Qty: ${item.Quantity}</p>
-                      <p>Total Cost: $${item.totalCost}</p>
-                    </div>
-                  `
-                  ).join("")}
-                </div>
+                ${
+                  ticket.Note
+                    ? `
+                  <div class="section">
+                    <h2>Note</h2>
+                    <div>${ticket.Note}</div>
+                  </div>
+                `
+                    : ""
+                }
               `
                   : ""
               }
@@ -273,26 +277,14 @@ const PrintSection = ({
           <label className="flex items-center space-x-4">
             <input
               type="checkbox"
-              name="head"
-              checked={printSelections.head}
+              name="ticketAndNote"
+              checked={printSelections.ticketAndNote}
               onChange={handleCheckboxChange}
               className={`form-checkbox h-5 w-5 rounded ${
                 theme === "dark" ? "text-blue-400" : "text-blue-600"
               }`}
             />
-            <span className="text-lg">Head</span>
-          </label>
-          <label className="flex items-center space-x-4">
-            <input
-              type="checkbox"
-              name="items"
-              checked={printSelections.items}
-              onChange={handleCheckboxChange}
-              className={`form-checkbox h-5 w-5 rounded ${
-                theme === "dark" ? "text-blue-400" : "text-blue-600"
-              }`}
-            />
-            <span className="text-lg">Items</span>
+            <span className="text-lg">Ticket</span>
           </label>
           <label className="flex items-center space-x-4">
             <input

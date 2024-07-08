@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import { BrowserRouter as Router } from "react-router-dom";
 import * as serviceWorker from "./serviceWorker";
 import ConfirmModal from "./components/ConfirmModal";
 import LoadingModal from "./components/LoadingModal";
-import Modal from "react-modal";
-Modal.setAppElement("#root"); // Set the app element for accessibility
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 const RootComponent = () => {

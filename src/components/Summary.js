@@ -244,9 +244,11 @@ const ViewFieldTicket = () => {
 
           const hostname = window.location.hostname;
           const parts = hostname.split(".");
-          let baseUrl;
 
-          baseUrl = "https://test.ogfieldticket.com";
+          const baseUrl =
+            parts.length > 2
+              ? `https://${parts.shift()}.ogfieldticket.com`
+              : "https://test.ogfieldticket.com";
 
           const response = await fetch(
             `${baseUrl}/api/tickets.php?ticket=${ticket.Ticket}`,
@@ -343,7 +345,12 @@ const ViewFieldTicket = () => {
     try {
       const updatedTicket = { ...ticket, Note: fieldNote };
       const hostname = window.location.hostname;
-      let baseUrl = "https://test.ogfieldticket.com";
+      const parts = hostname.split(".");
+
+      const baseUrl =
+        parts.length > 2
+          ? `https://${parts.shift()}.ogfieldticket.com`
+          : "https://test.ogfieldticket.com";
 
       localStorage.setItem("currentTicket", JSON.stringify(updatedTicket));
       const storedTickets = JSON.parse(localStorage.getItem("tickets")) || [];
@@ -435,9 +442,11 @@ const ViewFieldTicket = () => {
     try {
       const hostname = window.location.hostname;
       const parts = hostname.split(".");
-      let baseUrl;
 
-      baseUrl = "https://test.ogfieldticket.com";
+      const baseUrl =
+        parts.length > 2
+          ? `https://${parts.shift()}.ogfieldticket.com`
+          : "https://test.ogfieldticket.com";
 
       if (navigator.onLine) {
         const response = await fetch(
@@ -502,9 +511,11 @@ const ViewFieldTicket = () => {
     try {
       const hostname = window.location.hostname;
       const parts = hostname.split(".");
-      let baseUrl;
 
-      baseUrl = "https://test.ogfieldticket.com";
+      const baseUrl =
+        parts.length > 2
+          ? `https://${parts.shift()}.ogfieldticket.com`
+          : "https://test.ogfieldticket.com";
 
       const encodedImageDirectory = encodeURIComponent(
         imageDirectory.replace(/^\.\.\//, "")
@@ -590,9 +601,13 @@ const ViewFieldTicket = () => {
 
   const handleUnbillClick = async () => {
     try {
-      let baseUrl;
+      const hostname = window.location.hostname;
+      const parts = hostname.split(".");
 
-      baseUrl = "https://test.ogfieldticket.com";
+      const baseUrl =
+        parts.length > 2
+          ? `https://${parts.shift()}.ogfieldticket.com`
+          : "https://test.ogfieldticket.com";
 
       const updatedTicket = { ...ticket, Billed: "N" };
 
@@ -622,9 +637,11 @@ const ViewFieldTicket = () => {
       const updatedTicket = { ...ticket, Billed: "Y" };
       const hostname = window.location.hostname;
       const parts = hostname.split(".");
-      let baseUrl;
 
-      baseUrl = "https://test.ogfieldticket.com";
+      const baseUrl =
+        parts.length > 2
+          ? `https://${parts.shift()}.ogfieldticket.com`
+          : "https://test.ogfieldticket.com";
 
       const response = await fetch(
         `${baseUrl}/api/tickets.php?ticket=${ticket.Ticket}`,
@@ -1064,7 +1081,8 @@ const ViewFieldTicket = () => {
                           >
                             Qty:
                           </label>
-                          {item.UseQuantity === "Y" && item.Quantity !== 0 ? (
+                          {item.UseQuantity === "Y" &&
+                          item.ItemQuantity !== 0 ? (
                             <input
                               type="number"
                               name="Quantity"

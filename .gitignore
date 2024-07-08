@@ -10,7 +10,7 @@
 /coverage
 reset.bat
 # production
-/build
+
 
 # misc
 .DS_Store
